@@ -4,5 +4,6 @@ namespace Versionable\Common\Compare;
 
 interface ComparableInterface
 {
-  public function compareTo($object);
+
+    public function compareTo($object);
 }

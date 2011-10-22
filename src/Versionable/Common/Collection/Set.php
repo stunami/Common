@@ -8,69 +8,66 @@ namespace Versionable\Common\Collection;
  */
 class Set extends Collection implements SetInterface, \Serializable
 {
-  public function __construct(array $elements = array())
-  {
-    parent::__construct($elements);
-  }
+
+    public function __construct(array $elements = array())
+    {
+        parent::__construct($elements);
+    }
 
     /**
-   * Addings element to Set unless it already exists within the set
-   *
-   * @param scalar $element
-   * @throws \InvalidArgumentException
-   * @return boolean
-   */
-  public function add($element)
-  {
-    if ($this->contains($element))
+     * Addings element to Set unless it already exists within the set
+     *
+     * @param scalar $element
+     * @throws \InvalidArgumentException
+     * @return boolean
+     */
+    public function add($element)
     {
-      $message = 'Duplicate element added';
-      throw new \InvalidArgumentException($message);
+        if ($this->contains($element)) {
+            $message = 'Duplicate element added';
+            throw new \InvalidArgumentException($message);
+        }
+
+        return parent::add($element);
     }
 
-    return parent::add($element);
-  }
-
-  /**
-   * Adds a set of elements as long no duplicates are found
-   *
-   * @param CollectionInterface $collection
-   * @return boolean
-   */
-  public function addAll(CollectionInterface $collection = NULL) 
-  {
-    $iterator = $collection->getIterator();
-
-    foreach($iterator as $element) 
+    /**
+     * Adds a set of elements as long no duplicates are found
+     *
+     * @param CollectionInterface $collection
+     * @return boolean
+     */
+    public function addAll(CollectionInterface $collection = NULL)
     {
-      if ($this->contains($element))
-      {
-        throw new \InvalidArgumentException('Duplicate element are not allowed');
-      }
+        $iterator = $collection->getIterator();
+
+        foreach ($iterator as $element) {
+            if ($this->contains($element)) {
+                throw new \InvalidArgumentException('Duplicate element are not allowed');
+            }
+        }
+
+        return parent::addAll($collection);
     }
 
-    return parent::addAll($collection);
-  }
-
-  public function serialize()
-  {
-    return \serialize($this->elements);
-  }
-
-  public function unserialize($serializedData)
-  {
-    $elements = @\unserialize($serializedData);
-
-    if (is_array($elements))
+    public function serialize()
     {
-      foreach ($elements as $element)
-      {
-        $this->add($element);
-      }
-
-      return true;
+        return \serialize($this->elements);
     }
 
-    throw new \InvalidArgumentException('Unable to unserialize data');
-  }
+    public function unserialize($serializedData)
+    {
+        $elements = @\unserialize($serializedData);
+
+        if (is_array($elements)) {
+            foreach ($elements as $element) {
+                $this->add($element);
+            }
+
+            return true;
+        }
+
+        throw new \InvalidArgumentException('Unable to unserialize data');
+    }
+
 }

@@ -6,31 +6,29 @@ use Versionable\Common\Compare\ComparableInterface;
 
 class MockComparableItem implements ComparableInterface
 {
-  protected $name = '';
-  
-  public function __construct($name)
-  {
-    $this->name = $name;
-  }
-  
-  public function getName()
-  {
-    return $this->name;
-  }
+    protected $name = '';
 
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
 
-  public function compareTo($object)
-  {
-    if ($this->getName() < $object->getName())
+    public function getName()
     {
-      return -1;
+        return $this->name;
     }
-    
-    if ($this->getName() > $object->getName())
+
+    public function compareTo($object)
     {
-      return 1;
+        if ($this->getName() < $object->getName()) {
+            return -1;
+        }
+
+        if ($this->getName() > $object->getName()) {
+            return 1;
+        }
+
+        return 0;
     }
-    
-    return 0;
-  }
+
 }

@@ -8,167 +8,150 @@ use Versionable\Common\Compare\ComparableInterface;
 
 class TreeSet extends Set implements SortedSetInterface
 {
-  protected $comparator = null;
-  
-  public function __construct(array $elements = array(), ComparatorInterface $comparator = null)
-  {
-    parent::__construct($elements);
-    
-    if (false === is_null($comparator))
-    {
-      $this->setComparator($comparator);
-    }
-    
-    $this->sort();
-  }
-    
-  public function comparator()
-  {
-    return $this->comparator;
-  }
+    protected $comparator = null;
 
-  public function add($element)
-  {
-    $ret = parent::add($element);
+    public function __construct(array $elements = array(), ComparatorInterface $comparator = null)
+    {
+        parent::__construct($elements);
 
-    $this->sort();
+        if (false === is_null($comparator)) {
+            $this->setComparator($comparator);
+        }
 
-    return $ret;
-  }
+        $this->sort();
+    }
 
-  public function remove($element)
-  {
-    $ret = parent::remove($element);
+    public function comparator()
+    {
+        return $this->comparator;
+    }
 
-    $this->sort();
+    public function add($element)
+    {
+        $ret = parent::add($element);
 
-    return $ret;
-  }
-  
-  public function first()
-  {
-    if ($this->isEmpty() === false)
-    {
-      return $this->elements[0];
-    }
-    
-    return null;
-  }
-  
-  public function headSet($toElement)
-  {
-    $set = array();
-    foreach($this->elements as $key => $element)
-    {
-      if ($element === $toElement && !empty($set))
-      {
-        $class = get_class($this);
-        
-        return new $class($set);
-      }
-      
-      $set[] = $element;
-    }
-    
-    return null;
-  }
-  
-  public function isValid($element)
-  {
-    if (parent::isValid($element) && $element instanceof ComparableInterface)
-    {
-      return true;
-    }    
-    
-    return false;
-  }
+        $this->sort();
 
-  public function last()
-  {
-    if ($this->isEmpty() === false)
-    {
-      return $this->elements[$this->count() - 1];
+        return $ret;
     }
-    
-    return null;
-  }
-  
-  public function subSet($fromElement, $toElement)
-  {
-    $subSet = array();    
-    $inRange = false;
-    
-    foreach($this->elements as $key => $element)
-    {
 
-      if ($element === $fromElement)
-      {
-        $inRange = true;
-      }
-      
-      if ($inRange === false)
-      {
-        continue;
-      }
-      
-      $subSet[] = $element;
-      
-      if ($inRange && $element === $toElement)
-      {
-        $class = get_class($this);
-        
-        return new $class($subSet);
-      }
-    }
-    
-    return null;
-  }
-  
-  public function tailSet($fromElement) 
-  {
-    $set = array();
-    
-    $found = false;
-    foreach($this->elements as $key => $element)
+    public function remove($element)
     {
-      if ($element === $fromElement)
-      {
-        $found = true;
-      }
-      
-      if (false === $found)
-      {
-        continue;
-      }
-      
-      $set[] = $element;
-    }
-    
-    if ($found)
-    {
-      $class = get_class($this);
+        $ret = parent::remove($element);
 
-      return new $class($set);
+        $this->sort();
+
+        return $ret;
     }
-    
-    return null;
-  }
-  
-  protected function setComparator(ComparatorInterface $comparator)
-  {
-    $this->comparator = $comparator;
-  }
-  
-  protected function sort()
-  {
-    if (false === is_null($this->comparator()))
+
+    public function first()
     {
-      usort($this->elements, array($this->comparator(), 'compare'));
+        if ($this->isEmpty() === false) {
+            return $this->elements[0];
+        }
+
+        return null;
     }
-    else
+
+    public function headSet($toElement)
     {
-      sort($this->elements);
+        $set = array();
+        foreach ($this->elements as $key => $element) {
+            if ($element === $toElement && !empty($set)) {
+                $class = get_class($this);
+
+                return new $class($set);
+            }
+
+            $set[] = $element;
+        }
+
+        return null;
     }
-  }
-  
+
+    public function isValid($element)
+    {
+        if (parent::isValid($element) && $element instanceof ComparableInterface) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function last()
+    {
+        if ($this->isEmpty() === false) {
+            return $this->elements[$this->count() - 1];
+        }
+
+        return null;
+    }
+
+    public function subSet($fromElement, $toElement)
+    {
+        $subSet = array();
+        $inRange = false;
+
+        foreach ($this->elements as $key => $element) {
+
+            if ($element === $fromElement) {
+                $inRange = true;
+            }
+
+            if ($inRange === false) {
+                continue;
+            }
+
+            $subSet[] = $element;
+
+            if ($inRange && $element === $toElement) {
+                $class = get_class($this);
+
+                return new $class($subSet);
+            }
+        }
+
+        return null;
+    }
+
+    public function tailSet($fromElement)
+    {
+        $set = array();
+
+        $found = false;
+        foreach ($this->elements as $key => $element) {
+            if ($element === $fromElement) {
+                $found = true;
+            }
+
+            if (false === $found) {
+                continue;
+            }
+
+            $set[] = $element;
+        }
+
+        if ($found) {
+            $class = get_class($this);
+
+            return new $class($set);
+        }
+
+        return null;
+    }
+
+    protected function setComparator(ComparatorInterface $comparator)
+    {
+        $this->comparator = $comparator;
+    }
+
+    protected function sort()
+    {
+        if (false === is_null($this->comparator())) {
+            usort($this->elements, array($this->comparator(), 'compare'));
+        } else {
+            sort($this->elements);
+        }
+    }
+
 }
