@@ -17,7 +17,7 @@ interface CollectionInterface extends \IteratorAggregate, \Countable
      *
      * @return boolean
      */
-    public function addAll(CollectionInterface $collection = NULL);
+    public function addAll(CollectionInterface $collection);
 
     /**
      *
@@ -52,25 +52,19 @@ interface CollectionInterface extends \IteratorAggregate, \Countable
      *
      * @return boolean
      */
-    public function isValid($element);
-
-    /**
-     *
-     * @return boolean
-     */
     public function remove($element);
 
     /**
      *
      * @return boolean
      */
-    public function removeAll(CollectionInterface $collection = NULL);
+    public function removeAll(CollectionInterface $collection);
 
     /**
      *
      * @return boolean
      */
-    public function retainAll(CollectionInterface $collection = NULL);
+    public function retainAll(CollectionInterface $collection);
 
     /**
      *

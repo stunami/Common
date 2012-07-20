@@ -14,7 +14,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
      * @var Set
      */
     protected $object;
-    
+
     protected $elements = array();
 
     /**
@@ -24,7 +24,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->object = new Set();
-        
+
         $this->elements['alpha'] = new Element('alpha');
         $this->elements['bravo'] = new Element('bravo');
         $this->elements['charlie'] = new Element('charlie');
@@ -39,7 +39,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
     }
-    
+
     public function testAdd()
     {
       $this->object->add($this->elements['alpha']);
@@ -52,7 +52,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
       $this->object->add($element);
       $this->object->add($element);
     }
-   
+
     public function testAddAll()
     {
       $set = $this->getMockForAbstractClass('\\Versionable\\Common\\Collection\\Set');
@@ -66,7 +66,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals(array($this->elements['alpha'],$this->elements['bravo'],$this->elements['charlie']), $elements);
     }
 
-    public function testAddAllNoDuplicates() 
+    public function testAddAllNoDuplicates()
     {
       $this->setExpectedException('\\InvalidArgumentException');
 
@@ -79,28 +79,28 @@ class SetTest extends \PHPUnit_Framework_TestCase
 
       $this->object->addAll($set);
     }
-    
+
     public function testSerialize()
     {
       $this->object->add($this->elements['alpha']);
       $this->object->add($this->elements['bravo']);
-      
+
       $this->assertEquals(serialize($this->readAttribute($this->object, 'elements')), $this->object->serialize());
     }
-    
+
     public function testUnserialize()
     {
       $elements = array($this->elements['alpha'], $this->elements['bravo']);
-      
+
       $this->object->unserialize(serialize($elements));
-      
+
       $this->assertEquals($elements, $this->readAttribute($this->object, 'elements'));
     }
-    
+
     public function testUnserializeInvalid()
     {
       $this->setExpectedException('\\InvalidArgumentException');
-      
+
       $this->object->unserialize('invalid');
     }
 }

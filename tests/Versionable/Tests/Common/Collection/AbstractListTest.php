@@ -13,7 +13,7 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
      * @var AbstractList
      */
     protected $object;
-    
+
     protected $elements = array();
 
     /**
@@ -23,7 +23,7 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->object = $this->getMockForAbstractClass('Versionable\Common\Collection\AbstractList');
-        
+
         $this->elements['alpha'] = new Element('alpha');
         $this->elements['bravo'] = new Element('bravo');
         $this->elements['charlie'] = new Element('charlie');
@@ -43,34 +43,31 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
     {
       $object = new \stdClass();
       $object->name = 'one';
-      
       $this->object->addAt(0, $object);
-
-      $elements = $this->readAttribute($this->object, 'elements');
-      $this->assertEquals($object, $elements[0]);
+      $this->assertEquals($object, $this->object->get(0));
     }
 
     public function testAddAtFail()
     {
       $this->setExpectedException('\OutOfBoundsException');
-      
+
       $this->object->addAt(1, new \stdClass());
     }
-    
+
     public function testAddAllAt()
     {
       $this->object = $this->getMockForAbstractClass('Versionable\Common\Collection\AbstractList', array(array_values($this->elements)));
-      
+
       $elements = array();
       $elements[] = new Element('foxtrot');
       $elements[] = new Element('gamma');
-      
+
       $list = $this->getMockForAbstractClass('Versionable\Common\Collection\AbstractList', array($elements));
-      
+
       $this->object->addAllAt(2, $list);
-      
+
       $expected = array();
-      
+
       $expected[] = new Element('alpha');
       $expected[] = new Element('bravo');
       $expected[] = $elements[0];
@@ -78,18 +75,18 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
       $expected[] = new Element('charlie');
       $expected[] = new Element('delta');
       $expected[] = new Element('echo');
-            
-      
+
+
       $this->assertEquals($expected, $this->readAttribute($this->object, 'elements'));
     }
 
     public function testGet()
     {
       $this->object = $this->getMockForAbstractClass('Versionable\Common\Collection\AbstractList', array(array_values($this->elements)));
-      
+
       $this->assertEquals($this->elements['echo'], $this->object->get(4));
     }
-    
+
     public function testGetOutOfBounds()
     {
       $this->setExpectedException('\\OutOfBoundsException');
@@ -99,14 +96,14 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
     public function testIndexOf()
     {
       $this->object = $this->getMockForAbstractClass('Versionable\Common\Collection\AbstractList', array(array_values($this->elements)));
-      
+
       $this->assertEquals(4, $this->object->indexOf($this->elements['echo']));
     }
-    
+
     public function testIndexOfFalse()
     {
       $this->object = $this->getMockForAbstractClass('Versionable\Common\Collection\AbstractList', array(array_values($this->elements)));
-      
+
       $this->assertFalse($this->object->indexOf(new Element('missing')));
     }
 
@@ -116,15 +113,15 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
     public function testRemoveAt()
     {
       $this->object = $this->getMockForAbstractClass('Versionable\Common\Collection\AbstractList', array(array_values($this->elements)));
-      
+
       $this->object->removeAt(4);
-      
+
       $expected = array_values($this->elements);
       unset($expected[4]);
-      
+
       $this->assertEquals($expected, $this->readAttribute($this->object, 'elements'));
     }
-    
+
     public function testRemoveAtFalse()
     {
       $this->assertFalse($this->object->removeAt(100));
@@ -134,10 +131,10 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
     {
       $one = new \stdClass();
       $one->name = 'one';
-      
+
       $two = new \stdClass();
       $two->name = 'two';
-      
+
       $this->object->add($one);
       $this->object->set(0, $two);
 
@@ -145,7 +142,7 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
 
       $this->assertEquals($two, $elements[0]);
     }
-    
+
     public function testSetOutOfBounds()
     {
       $this->setExpectedException('\\OutOfBoundsException');
@@ -162,18 +159,18 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
       $elements[] = $this->elements['echo'];
 
       $collection = $this->getMockForAbstractClass('Versionable\Common\Collection\Collection', array($elements));
-      
+
       $this->object->addAll($collection);
-            
+
       $expected = array($this->elements['charlie'], $this->elements['delta']);
-      
+
       $this->assertEquals($expected, $this->object->subList(2, 4));
     }
-    
+
     public function testSubListOutOfBounds()
     {
       $this->setExpectedException('\OutOfBoundsException');
-      
+
       $elements = array();
       $elements[] = $this->elements['alpha'];
       $elements[] = $this->elements['bravo'];
@@ -182,16 +179,16 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
       $elements[] = $this->elements['echo'];
 
       $collection = $this->getMockForAbstractClass('Versionable\Common\Collection\Collection', array($elements));
-      
+
       $this->object->addAll($collection);
-      
+
       $this->object->subList(2, 10);
     }
-    
+
     public function testSubListReversedRange()
     {
       $this->setExpectedException('\OutOfBoundsException');
-      
+
       $elements = array();
       $elements[] = $this->elements['alpha'];
       $elements[] = $this->elements['bravo'];
@@ -200,9 +197,9 @@ class AbstractListTest extends \PHPUnit_Framework_TestCase
       $elements[] = $this->elements['echo'];
 
       $collection = $this->getMockForAbstractClass('Versionable\Common\Collection\Collection', array($elements));
-      
+
       $this->object->addAll($collection);
-      
+
       $this->object->subList(3, 2);
     }
 

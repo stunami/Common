@@ -2,9 +2,24 @@
 
 namespace Versionable\Common\Collection;
 
+use Versionable\Common\Validator\ValidatorInterface;
+use Versionable\Common\Validator\ObjectValidator;
+
 class Map implements MapInterface
 {
-    protected $elements = array();
+    private $elements = array();
+
+    private $validator;
+
+    public function __construct(ValidatorInterface $validator = null)
+    {
+        if (null === $validator)
+        {
+            $validator = new ObjectValidator();
+        }
+
+        $this->setValidator($validator);
+    }
 
     public function clear()
     {
@@ -81,15 +96,6 @@ class Map implements MapInterface
         return false;
     }
 
-    public function isValid($element)
-    {
-        if (is_object($element)) {
-            return true;
-        }
-
-        return false;
-    }
-
     public function keySet()
     {
         return new Set(array_keys($this->elements));
@@ -97,7 +103,7 @@ class Map implements MapInterface
 
     public function put($key, $value)
     {
-        $this->doCheckValid($value);
+        $this->isValid($value);
 
         $this->elements[$key] = $value;
     }
@@ -105,7 +111,7 @@ class Map implements MapInterface
     public function putAll(MapInterface $map)
     {
         foreach ($map->toArray() as $value) {
-            $this->doCheckValid($value);
+            $this->isValid($value);
         }
 
         $this->elements = array_merge($this->elements, $map->toArray());
@@ -125,14 +131,24 @@ class Map implements MapInterface
         return $this->elements;
     }
 
+    public function getValidator()
+    {
+        return $this->validator;
+    }
+
+    public function setValidator($validator)
+    {
+        $this->validator = $validator;
+    }
+
     public function values()
     {
         return array_values($this->elements);
     }
 
-    protected function doCheckValid($element)
+    protected function isValid($element)
     {
-        if ($this->isValid($element) === false) {
+        if ($this->getValidator()->isValid($element) === false) {
             throw new \InvalidArgumentException('Invalid element value for Map');
         }
     }

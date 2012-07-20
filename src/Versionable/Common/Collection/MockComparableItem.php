@@ -6,7 +6,7 @@ use Versionable\Common\Compare\ComparableInterface;
 
 class MockComparableItem implements ComparableInterface
 {
-    protected $name = '';
+    private $name = '';
 
     public function __construct($name)
     {

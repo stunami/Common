@@ -14,7 +14,7 @@ class ArrayListTest extends \PHPUnit_Framework_TestCase
      * @var ArrayList
      */
     protected $object;
-    
+
     protected $elements = array();
 
     /**
@@ -22,13 +22,13 @@ class ArrayListTest extends \PHPUnit_Framework_TestCase
      * This method is called before a test is executed.
      */
     protected function setUp()
-    {     
+    {
         $this->elements['alpha'] = new Element('alpha');
         $this->elements['bravo'] = new Element('bravo');
         $this->elements['charlie'] = new Element('charlie');
         $this->elements['delta'] = new Element('delta');
-        $this->elements['echo'] = new Element('echo');        
-        
+        $this->elements['echo'] = new Element('echo');
+
         $this->object = new ArrayList(array_values($this->elements));
     }
 
@@ -39,28 +39,28 @@ class ArrayListTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
     }
-    
+
     public function testRemoveRange()
     {
-     
+
       $expected = array($this->elements['alpha'], $this->elements['bravo'], $this->elements['echo']);
-      
+
       $this->object->removeRange(2, 4);
-      
-      $this->assertEquals($expected, $this->readAttribute($this->object, 'elements')); 
+
+      $this->assertEquals($expected, $this->readAttribute($this->object, 'elements'));
     }
-    
+
     public function testRangeRemoveOutofBounds()
     {
       $this->setExpectedException('\OutOfBoundsException');
-      
+
       $this->object->removeRange(0, 100);
     }
-    
+
     public function testRangeRemoveBadRange()
     {
       $this->setExpectedException('\OutOfBoundsException');
-      
+
       $this->object->removeRange(4, 0);
     }
 }

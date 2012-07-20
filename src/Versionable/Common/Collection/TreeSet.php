@@ -8,7 +8,7 @@ use Versionable\Common\Compare\ComparableInterface;
 
 class TreeSet extends Set implements SortedSetInterface
 {
-    protected $comparator = null;
+    private $comparator = null;
 
     public function __construct(array $elements = array(), ComparatorInterface $comparator = null)
     {
@@ -18,7 +18,7 @@ class TreeSet extends Set implements SortedSetInterface
             $this->setComparator($comparator);
         }
 
-        $this->sort();
+        $this->setElements($this->sort());
     }
 
     public function comparator()
@@ -30,7 +30,7 @@ class TreeSet extends Set implements SortedSetInterface
     {
         $ret = parent::add($element);
 
-        $this->sort();
+        $this->setElements($this->sort());
 
         return $ret;
     }
@@ -39,7 +39,7 @@ class TreeSet extends Set implements SortedSetInterface
     {
         $ret = parent::remove($element);
 
-        $this->sort();
+        $this->setElements($this->sort());
 
         return $ret;
     }
@@ -47,7 +47,10 @@ class TreeSet extends Set implements SortedSetInterface
     public function first()
     {
         if ($this->isEmpty() === false) {
-            return $this->elements[0];
+
+            $elements = $this->getElements();
+
+            return $elements[0];
         }
 
         return null;
@@ -56,7 +59,7 @@ class TreeSet extends Set implements SortedSetInterface
     public function headSet($toElement)
     {
         $set = array();
-        foreach ($this->elements as $key => $element) {
+        foreach ($this->getElements() as $key => $element) {
             if ($element === $toElement && !empty($set)) {
                 $class = get_class($this);
 
@@ -69,19 +72,12 @@ class TreeSet extends Set implements SortedSetInterface
         return null;
     }
 
-    public function isValid($element)
-    {
-        if (parent::isValid($element) && $element instanceof ComparableInterface) {
-            return true;
-        }
-
-        return false;
-    }
-
     public function last()
     {
         if ($this->isEmpty() === false) {
-            return $this->elements[$this->count() - 1];
+            $elements = $this->getElements();
+
+            return $elements[$this->count() - 1];
         }
 
         return null;
@@ -92,7 +88,7 @@ class TreeSet extends Set implements SortedSetInterface
         $subSet = array();
         $inRange = false;
 
-        foreach ($this->elements as $key => $element) {
+        foreach ($this->getElements() as $key => $element) {
 
             if ($element === $fromElement) {
                 $inRange = true;
@@ -119,7 +115,7 @@ class TreeSet extends Set implements SortedSetInterface
         $set = array();
 
         $found = false;
-        foreach ($this->elements as $key => $element) {
+        foreach ($this->getElements() as $key => $element) {
             if ($element === $fromElement) {
                 $found = true;
             }
@@ -147,10 +143,20 @@ class TreeSet extends Set implements SortedSetInterface
 
     protected function sort()
     {
+        $elements = $this->getElements();
         if (false === is_null($this->comparator())) {
-            usort($this->elements, array($this->comparator(), 'compare'));
+            usort($elements, array($this->comparator(), 'compare'));
         } else {
-            sort($this->elements);
+            sort($elements);
+        }
+
+        return $elements;
+    }
+
+    protected function isValid($element)
+    {
+        if (false === $element instanceof ComparableInterface || $this->getValidator()->isValid($element) === false) {
+            throw new \InvalidArgumentException('Invalid element value for ' . __CLASS__);
         }
     }
 

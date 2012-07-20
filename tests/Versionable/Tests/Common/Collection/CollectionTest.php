@@ -15,13 +15,13 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      * @var Collection
      */
     protected $object;
-    
+
     protected $elements = array();
 
     protected function setUp()
     {
         $this->object = $this->getMockForAbstractClass('\Versionable\Common\Collection\Collection');
-        
+
         $this->elements['alpha'] = new Element('alpha');
         $this->elements['bravo'] = new Element('bravo');
         $this->elements['charlie'] = new Element('charlie');
@@ -32,13 +32,13 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
     }
-    
+
     public function testClear()
     {
       $this->object->add(new \stdClass());
-      
+
       $this->object->clear();
-      
+
       $this->assertEmpty($this->readAttribute($this->object, 'elements'));
     }
 
@@ -56,7 +56,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $elements = $this->readAttribute($this->object, 'elements');
       $this->assertEquals(empty($elements), $this->object->isEmpty());
     }
-    
+
     public function testHashCode()
     {
       $expected = sha1('Versionable\Common\Collection\Collection' . serialize($this->readAttribute($this->object, 'elements')));
@@ -83,7 +83,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $elements = $this->readAttribute($this->object, 'elements');
       $this->assertEquals(in_array($element, $elements), $this->object->contains($element));
     }
-    
+
     public function testAddInvalid()
     {
       $this->setExpectedException('\InvalidArgumentException');
@@ -98,7 +98,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $elements = $this->readAttribute($this->object, 'elements');
       $this->assertFalse(in_array($element, $elements));
     }
-    
+
     public function testRemoveFalse()
     {
       $element = new \stdClass();
@@ -108,7 +108,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testContainsAll()
-    { 
+    {
       $this->object->add($this->elements['alpha']);
       $this->object->add($this->elements['bravo']);
       $this->object->add($this->elements['charlie']);
@@ -157,10 +157,12 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $elements = $this->readAttribute($this->object, 'elements');
       $this->assertEquals($elements, array($this->elements['alpha'],$this->elements['delta']));
 
-      $this->assertTrue($this->object->removeAll());
+      $remove = $this->getMockForAbstractClass('\\Versionable\\Common\\Collection\\Collection');
+
+      $this->assertTrue($this->object->removeAll($remove));
 
       $elements = $this->readAttribute($this->object, 'elements');
-      $this->assertEquals($elements, array());
+      $this->assertEquals($elements, array($this->elements['alpha'], $this->elements['delta']));
     }
 
     public function testRetainAll()
@@ -179,7 +181,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $elements = $this->readAttribute($this->object, 'elements');
       $this->assertEquals($elements, array($this->elements['bravo'],$this->elements['delta']));
 
-      $this->assertTrue($this->object->retainAll());
+      $retain = $this->getMockForAbstractClass('\\Versionable\\Common\\Collection\\Collection');
+
+      $this->assertTrue($this->object->retainAll($retain));
 
       $elements = $this->readAttribute($this->object, 'elements');
       $this->assertEquals($elements, array());
@@ -191,7 +195,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $this->object->add($this->elements['bravo']);
       $this->object->add($this->elements['charlie']);
       $this->object->add($this->elements['delta']);
-      
+
       $elements = $this->readAttribute($this->object, 'elements');
       $this->assertEquals($this->object->toArray(), $elements);
     }
@@ -199,10 +203,5 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testGetIterator()
     {
       $this->assertEquals(new \ArrayIterator, $this->object->getIterator());
-    }
-
-    public function testIsValid()
-    {
-      $this->assertTrue($this->object->isValid(new Element('100')));
     }
 }

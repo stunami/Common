@@ -2,12 +2,23 @@
 
 namespace Versionable\Common\Collection;
 
+use \Versionable\Common\Validator\ValidatorInterface;
+use \Versionable\Common\Validator\ObjectValidator;
+
 abstract class Collection implements CollectionInterface
 {
-    protected $elements = array();
+    private $elements = array();
 
-    public function __construct(array $elements = array())
+    private $validator;
+
+    public function __construct(array $elements = array(), ValidatorInterface $validator = null)
     {
+        if (null === $validator)
+        {
+            $validator = new ObjectValidator();
+        }
+        $this->setValidator($validator);
+
         $this->doAddAll($elements);
     }
 
@@ -18,9 +29,13 @@ abstract class Collection implements CollectionInterface
      */
     public function add($element)
     {
-        $this->doCheckValid($element);
+        $this->isValid($element);
 
-        $this->elements[] = $element;
+        $elements = $this->getElements();
+
+        $elements[] = $element;
+
+        $this->setElements($elements);
     }
 
     /**
@@ -44,7 +59,7 @@ abstract class Collection implements CollectionInterface
      */
     public function contains($element)
     {
-        return \in_array($element, $this->elements, true);
+        return \in_array($element, $this->getElements(), true);
     }
 
     /**
@@ -72,12 +87,12 @@ abstract class Collection implements CollectionInterface
      */
     public function count()
     {
-        return count($this->elements);
+        return count($this->getElements());
     }
 
     public function clear()
     {
-        $this->elements = array();
+        $this->setElements(array());
     }
 
     /**
@@ -87,7 +102,7 @@ abstract class Collection implements CollectionInterface
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->elements);
+        return new \ArrayIterator($this->getElements());
     }
 
     /**
@@ -97,7 +112,7 @@ abstract class Collection implements CollectionInterface
      */
     public function hashCode()
     {
-        return sha1(__CLASS__ . serialize($this->elements));
+        return sha1(__CLASS__ . serialize($this->getElements()));
     }
 
     /**
@@ -107,16 +122,8 @@ abstract class Collection implements CollectionInterface
      */
     public function isEmpty()
     {
-        return empty($this->elements);
-    }
-
-    public function isValid($element)
-    {
-        if (is_object($element)) {
-            return true;
-        }
-
-        return false;
+        $elements = $this->getElements();
+        return empty($elements);
     }
 
     /**
@@ -126,12 +133,13 @@ abstract class Collection implements CollectionInterface
      */
     public function remove($element)
     {
-        $key = array_search($element, $this->elements);
+        $key = array_search($element, $this->getElements());
 
         if ($key !== false) {
-            unset($this->elements[$key]);
+            $elements = $this->getElements();
+            unset($elements[$key]);
 
-            $this->elements = array_merge(array(), $this->elements);
+            $this->setElements(array_merge(array(), $elements));
 
             return true;
         }
@@ -145,19 +153,14 @@ abstract class Collection implements CollectionInterface
      * @param CollectionInterface $collection
      * @return boolean
      */
-    public function removeAll(CollectionInterface $collection = NULL)
+    public function removeAll(CollectionInterface $collection)
     {
+        $iterator = $collection->getIterator();
 
-        if (is_null($collection)) {
-            $this->elements = array();
-        } else {
-            $iterator = $collection->getIterator();
-
-            foreach ($iterator as $index => $element) {
-                if ($this->contains($element)) {
-                    while (array_search($element, $this->elements) !== false) {
-                        $this->remove($element);
-                    }
+        foreach ($iterator as $index => $element) {
+            if ($this->contains($element)) {
+                while (array_search($element, $this->getElements()) !== false) {
+                    $this->remove($element);
                 }
             }
         }
@@ -171,25 +174,40 @@ abstract class Collection implements CollectionInterface
      * @param CollectionInterface $collection
      * @return boolean
      */
-    public function retainAll(CollectionInterface $collection = NULL)
+    public function retainAll(CollectionInterface $collection)
     {
+        $elements = array();
 
-        if (is_null($collection)) {
-            $this->elements = array();
-        } else {
-            $elements = array();
-
-            $iterator = $collection->getIterator();
-            foreach ($iterator as $element) {
-                if (\in_array($element, $this->elements)) {
-                    $elements[] = $element;
-                }
+        $iterator = $collection->getIterator();
+        foreach ($iterator as $element) {
+            if (\in_array($element, $this->getElements())) {
+                $elements[] = $element;
             }
-
-            $this->elements = $elements;
         }
 
+        $this->setElements($elements);
+
         return true;
+    }
+
+    public function getElements()
+    {
+        return $this->elements;
+    }
+
+    public function setElements(array $elements)
+    {
+        $this->elements = $elements;
+    }
+
+    public function getValidator()
+    {
+        return $this->validator;
+    }
+
+    public function setValidator(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
     }
 
     /**
@@ -199,21 +217,21 @@ abstract class Collection implements CollectionInterface
      */
     public function toArray()
     {
-        return $this->elements;
+        return $this->getElements();
     }
 
     protected function doAddAll($elements)
     {
         foreach ($elements as $element) {
-            $this->doCheckValid($element);
+            $this->isValid($element);
         }
 
-        $this->elements = \array_merge($this->elements, $elements);
+        $this->setElements(\array_merge($this->getElements(), $elements));
     }
 
-    protected function doCheckValid($element)
+    protected function isValid($element)
     {
-        if ($this->isValid($element) === false) {
+        if ($this->getValidator()->isValid($element) === false) {
             throw new \InvalidArgumentException('Invalid element value for collection');
         }
     }

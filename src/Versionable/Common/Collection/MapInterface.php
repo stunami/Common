@@ -21,8 +21,6 @@ interface MapInterface extends \IteratorAggregate, \Countable
 
     public function isEmpty();
 
-    public function isValid($element);
-
     public function keySet();
 
     public function put($key, $value);

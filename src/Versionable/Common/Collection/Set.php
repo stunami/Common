@@ -52,7 +52,7 @@ class Set extends Collection implements SetInterface, \Serializable
 
     public function serialize()
     {
-        return \serialize($this->elements);
+        return \serialize($this->getElements());
     }
 
     public function unserialize($serializedData)

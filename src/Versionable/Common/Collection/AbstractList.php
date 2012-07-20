@@ -4,6 +4,10 @@ namespace Versionable\Common\Collection;
 
 abstract class AbstractList extends Collection implements ListInterface
 {
+    public function __construct(array $elements = array(), ValidatorInterface $validator = null)
+    {
+        parent::__construct($elements, $validator);
+    }
 
     /**
      * Inserts the specified element at the specified position in this list.
@@ -15,10 +19,15 @@ abstract class AbstractList extends Collection implements ListInterface
      */
     public function addAt($index, $element)
     {
-        $this->doCheckValid($element);
+        $this->isValid($element);
 
         if ($index == 0 || $index < $this->count()) {
-            $this->elements[$index] = $element;
+
+            $elements = $this->getElements();
+
+            $elements[$index] = $element;
+
+            $this->setElements($elements);
 
             return true;
         }
@@ -29,20 +38,22 @@ abstract class AbstractList extends Collection implements ListInterface
     public function addAllAt($index, ListInterface $list)
     {
         foreach ($list as $element) {
-            $this->doCheckValid($element);
+            $this->isValid($element);
         }
 
-        $start = array_slice($this->elements, 0, $index);
-        $end = array_slice($this->elements, $index);
+        $start = array_slice($this->getElements(), 0, $index);
+        $end = array_slice($this->getElements(), $index);
 
-
-        $this->elements = array_merge($start, $list->toArray(), $end);
+        $this->setElements(\array_merge($start, $list->toArray(), $end));
     }
 
     public function get($index)
     {
         if ($index < $this->count()) {
-            return $this->elements[$index];
+
+            $elements = $this->getElements();
+
+            return $elements[$index];
         }
 
         throw new \OutOfBoundsException('Invalid index');
@@ -50,7 +61,7 @@ abstract class AbstractList extends Collection implements ListInterface
 
     public function indexOf($element)
     {
-        foreach ($this->elements as $index => $elem) {
+        foreach ($this->getElements() as $index => $elem) {
             if ($elem === $element) {
                 return $index;
             }
@@ -61,8 +72,11 @@ abstract class AbstractList extends Collection implements ListInterface
 
     public function removeAt($index)
     {
-        if (isset($this->elements[$index])) {
-            unset($this->elements[$index]);
+        $elements = $this->getElements();
+        if (isset($elements[$index])) {
+            unset($elements[$index]);
+
+            $this->setElements($elements);
 
             return true;
         }
@@ -72,21 +86,27 @@ abstract class AbstractList extends Collection implements ListInterface
 
     public function set($index, $element)
     {
-        if (!isset($this->elements[$index])) {
+        $elements = $this->getElements();
+
+        if (!isset($elements[$index])) {
             throw new \OutOfBoundsException('Invalid index');
         }
 
-        $this->doCheckValid($element);
+        $this->isValid($element);
 
-        $this->elements[$index] = $element;
+        $elements[$index] = $element;
+
+        $this->setElements($elements);
 
         return true;
     }
 
     public function subList($fromIndex, $toIndex)
     {
-        if (isset($this->elements[$fromIndex]) && isset($this->elements[$toIndex]) && $fromIndex < $toIndex) {
-            return array_slice($this->elements, $fromIndex, $toIndex - $fromIndex);
+        $elements = $this->getElements();
+
+        if (isset($elements[$fromIndex]) && isset($elements[$toIndex]) && $fromIndex < $toIndex) {
+            return array_slice($elements, $fromIndex, $toIndex - $fromIndex);
         }
 
         throw new \OutOfBoundsException('Invalid range');

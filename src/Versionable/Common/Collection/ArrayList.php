@@ -7,16 +7,21 @@ namespace Versionable\Common\Collection;
  */
 class ArrayList extends AbstractList implements ListInterface
 {
-
-    public function removeRange($fromIndex, $toIndex)
+        public function removeRange($fromIndex, $toIndex)
     {
-        if (isset($this->elements[$fromIndex]) && isset($this->elements[$toIndex]) && $fromIndex < $toIndex) {
-            $start = array_slice($this->elements, 0, $fromIndex);
+        $elements = $this->getElements();
 
-            $end = array_slice($this->elements, $toIndex);
-            $this->elements = array_merge($start, $end);
+        if (isset($elements[$fromIndex]) && isset($elements[$toIndex]) && $fromIndex < $toIndex) {
 
-            return;
+            $remove = array_slice($elements, $fromIndex, $toIndex);
+            $start = array_slice($elements, 0, $fromIndex);
+
+            $end = array_slice($elements, $toIndex);
+            $elements = array_merge($start, $end);
+
+            $this->setElements($elements);
+
+            return $remove;
         }
 
         throw new \OutOfBoundsException('Invalid range');
